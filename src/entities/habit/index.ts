@@ -1,1 +1,1 @@
-export type { Habit } from './model/types';
+export type { Habit } from './model/types'

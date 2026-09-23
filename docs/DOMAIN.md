@@ -53,54 +53,61 @@
 
 ## 1. Три уровня абстракции
 
-| Уровень | Что показывает | Страницы |
-|---|---|---|
+| Уровень            | Что показывает     | Страницы                  |
+| ------------------ | ------------------ | ------------------------- |
 | **Текущий момент** | Что делать сегодня | Dashboard, Habits, Quests |
-| **Стратегия** | Куда иду и зачем | Dreams, Milestones |
-| **История** | Что уже прошёл | Achievements, Charts |
-| **Экономика** | Обратная связь | Rewards, XP, Level |
+| **Стратегия**      | Куда иду и зачем   | Dreams, Milestones        |
+| **История**        | Что уже прошёл     | Achievements, Charts      |
+| **Экономика**      | Обратная связь     | Rewards, XP, Level        |
 
 ---
 
 ## 2. Словарь домена
 
 ### 2.1. Dream (Мечта)
+
 Вектор. Большая цель без счётчика и без дедлайна.
 Примеры: «Стать музыкантом», «Здоровое тело», «Финансовая независимость».
 Не закрывается никогда. К ней только приближаешься.
 Без Milestones бессмысленна.
 
 ### 2.2. Milestone (Веха)
+
 Конкретный шаг к мечте. Двух типов:
 
 **Trackable** — измеряется числом. Автоматически инкрементируется.
-  Пример: «100 написанных битов», «100 тренировок planche».
+Пример: «100 написанных битов», «100 тренировок planche».
 
 **Declarative** — без счётчика. Пользователь отмечает вручную.
-  Пример: «Full planche», «10k слушателей в месяц».
+Пример: «Full planche», «10k слушателей в месяц».
 
 Обязательно привязан к Dream.
 
 ### 2.3. Achievement (Трофей)
+
 Запись о достижении milestone. Создаётся автоматически при переходе
 milestone в `achieved`.
 
 Отличия от Milestone:
+
 - Milestone — «я работаю над этим». Achievement — «я это сделал».
 - К Achievement крепится воспоминание: дата, заметка, фото.
 - Achievement неизменяем. Как трофей в музее.
 
 ### 2.4. Scale (Осколок)
+
 Одна из четырёх сфер жизни: **Health, Finance, Career, Projects**.
 В UI называем «осколок», в коде — `Scale`.
 
 Состояние — число 0..120 (%).
+
 - 0–100 — обычный диапазон.
 - 100–120 — сверхпродуктивность, только за счёт нерутины.
 
 Шкала — вычисляемая величина, не хранится.
 
 ### 2.5. Habit (Рутинная привычка)
+
 Повторяющееся действие в рамках одного осколка.
 
 - Расписание: ежедневно / по дням недели / раз в N дней.
@@ -110,6 +117,7 @@ milestone в `achieved`.
 - При пропуске в свой день → daily score падает.
 
 ### 2.6. Quest (Разовая задача)
+
 Одноразовое действие. Без расписания. Без штрафа.
 
 - Может быть привязан к Milestone.
@@ -117,9 +125,11 @@ milestone в `achieved`.
 - При выполнении даёт XP и бонус к шкале.
 
 ### 2.7. CheckIn (Отметка)
+
 Факт выполнения Habit в конкретный день.
 
 ### 2.8. Reward (Приз)
+
 Активность-награда: «2 часа игр», «День без работы», «Фильм вечером».
 
 - Не тратит XP.
@@ -129,6 +139,7 @@ milestone в `achieved`.
 - Нельзя накопить про запас.
 
 ### 2.9. PauseDay (Пауза)
+
 Отметка дня как «объективная пауза»: болезнь, больница, военкомат,
 переезд, форс-мажор.
 
@@ -139,6 +150,7 @@ milestone в `achieved`.
   паузы в этом месяце (Y% времени)». Зеркало, не запрет.
 
 ### 2.10. DailyReflection (Рефлексия дня) — отложено
+
 Опциональная запись дня из 3 фиксированных вопросов.
 НЕ входит в MVP. Обсудим после Фазы 2.
 
@@ -153,9 +165,9 @@ milestone в `achieved`.
 
 ```ts
 export const BALANCE = {
-  WINDOW_DAYS: 7,           // скользящее окно шкалы
-  DAILY_POOL_XP: 50,        // XP/день/шкала при полной рутине
-  SCALE_MAX: 120,           // максимум шкалы
+  WINDOW_DAYS: 7, // скользящее окно шкалы
+  DAILY_POOL_XP: 50, // XP/день/шкала при полной рутине
+  SCALE_MAX: 120, // максимум шкалы
 
   QUEST_XP: {
     decompose: 20,
@@ -182,13 +194,13 @@ M(S) = 0.25 + 0.75 × (S / 100)          при 0 ≤ S ≤ 100
 M(S) = 1.00 + 0.50 × ((S - 100) / 20)   при 100 < S ≤ 120
 ```
 
-| S | M |
-|---|---|
-| 0% | 0.25 |
-| 50% | 0.625 |
-| 80% | 0.85 |
-| 100% | 1.00 |
-| 120% | 1.50 |
+| S    | M     |
+| ---- | ----- |
+| 0%   | 0.25  |
+| 50%  | 0.625 |
+| 80%  | 0.85  |
+| 100% | 1.00  |
+| 120% | 1.50  |
 
 ### 3.3. Daily Score шкалы
 
@@ -199,6 +211,7 @@ s_d = routine_score + quest_bonus
 ```
 
 **routine_score:**
+
 ```
 Если день помечен PauseDay:
   routine_score = DAILY_POOL_XP
@@ -208,6 +221,7 @@ s_d = routine_score + quest_bonus
 ```
 
 **quest_bonus:**
+
 ```
 quest_bonus = Σ QUEST_SCALE_BONUS[type] по всем quest,
               выполненным в этот день и привязанным к шкале
@@ -225,15 +239,15 @@ S_today = (s_{d-WINDOW_DAYS+1} + ... + s_{d-1} + s_d) / WINDOW_DAYS
 
 **Проверка** (WINDOW_DAYS=7, полная рутина=100):
 
-| Сценарий | Эффект |
-|---|---|
-| Всё ок неделю | S = 100% |
-| Один пропуск | S ≈ 86% |
-| Два подряд | S ≈ 71% |
-| Неделя пропусков | S ≈ 0% |
-| Месяц пропусков + неделя нормы | S = 100% |
-| Один тяжёлый quest + всё остальное ок | S ≈ 103% |
-| Регулярные quest + всё ок | S = 120% (кап) |
+| Сценарий                              | Эффект         |
+| ------------------------------------- | -------------- |
+| Всё ок неделю                         | S = 100%       |
+| Один пропуск                          | S ≈ 86%        |
+| Два подряд                            | S ≈ 71%        |
+| Неделя пропусков                      | S ≈ 0%         |
+| Месяц пропусков + неделя нормы        | S = 100%       |
+| Один тяжёлый quest + всё остальное ок | S ≈ 103%       |
+| Регулярные quest + всё ок             | S = 120% (кап) |
 
 ### 3.5. XP за действие
 
@@ -242,11 +256,13 @@ XP = base_xp × M(S_scale)
 ```
 
 **Рутинная привычка** в момент CheckIn:
+
 ```
 base_xp = w_i / Σ(w) × DAILY_POOL_XP
 ```
 
 **Разовая задача** при завершении:
+
 ```
 base_xp = QUEST_XP[type]
 ```
@@ -259,13 +275,13 @@ base_xp = QUEST_XP[type]
 level = floor(sqrt(total_xp / LEVEL_BASE))
 ```
 
-| XP | Level |
-|---|---|
-| 100 | 1 |
-| 400 | 2 |
-| 900 | 3 |
-| 2500 | 5 |
-| 10000 | 10 |
+| XP    | Level |
+| ----- | ----- |
+| 100   | 1     |
+| 400   | 2     |
+| 900   | 3     |
+| 2500  | 5     |
+| 10000 | 10    |
 
 Уровень не откатывается. XP не тратится.
 
@@ -275,6 +291,7 @@ level = floor(sqrt(total_xp / LEVEL_BASE))
 Маппинг: `important → 2`, `desirable → 1`.
 
 Нормализация внутри шкалы:
+
 ```
 w_norm_i = w_i / Σ(w_j для всех рутинных привычек шкалы)
 ```
@@ -295,7 +312,7 @@ interface Dream {
   id: string;
   title: string;
   description?: string;
-  emoji?: string;              // 🎸 💪 💰 🚀
+  emoji?: string; // 🎸 💪 💰 🚀
   startedAt: string;
   archivedAt?: string;
 }
@@ -304,7 +321,7 @@ interface Dream {
 ### 4.2. Milestone
 
 ```ts
-type MilestoneType = 'trackable' | 'declarative';
+type MilestoneType = "trackable" | "declarative";
 
 interface Milestone {
   id: string;
@@ -321,7 +338,7 @@ interface Milestone {
 
   createdAt: string;
   lastNudgeAt?: string;
-  status: 'active' | 'achieved' | 'archived';
+  status: "active" | "achieved" | "archived";
 }
 ```
 
@@ -341,11 +358,11 @@ interface Achievement {
 ### 4.4. Habit
 
 ```ts
-type Priority = 'important' | 'desirable';
+type Priority = "important" | "desirable";
 type Schedule =
-  | { kind: 'daily' }
-  | { kind: 'weekly'; days: (0|1|2|3|4|5|6)[] }
-  | { kind: 'every'; nDays: number; startDate: string };
+  | { kind: "daily" }
+  | { kind: "weekly"; days: (0 | 1 | 2 | 3 | 4 | 5 | 6)[] }
+  | { kind: "every"; nDays: number; startDate: string };
 
 interface Habit {
   id: string;
@@ -362,7 +379,7 @@ interface Habit {
 ### 4.5. Quest
 
 ```ts
-type QuestType = 'decompose' | 'normal' | 'heavy';
+type QuestType = "decompose" | "normal" | "heavy";
 
 interface Quest {
   id: string;
@@ -371,7 +388,7 @@ interface Quest {
   type: QuestType;
   milestoneId?: string;
   dueDate?: string;
-  status: 'open' | 'done' | 'cancelled';
+  status: "open" | "done" | "cancelled";
   completedAt?: string;
   createdAt: string;
 }
@@ -383,10 +400,11 @@ interface Quest {
 interface CheckIn {
   id: string;
   habitId: string;
-  date: string;                // ISO date
+  date: string; // ISO date
   createdAt: string;
 }
 ```
+
 Unique (habitId, date).
 
 ### 4.7. Reward + RewardLog
@@ -420,14 +438,14 @@ interface RewardLog {
 interface PauseDay {
   id: string;
   date: string;
-  note: string;                // ОБЯЗАТЕЛЬНОЕ
+  note: string; // ОБЯЗАТЕЛЬНОЕ
 }
 ```
 
 ### 4.9. ScaleId
 
 ```ts
-type ScaleId = 'health' | 'finance' | 'career' | 'projects';
+type ScaleId = "health" | "finance" | "career" | "projects";
 ```
 
 Шкалы — константы, не сущность.
@@ -454,6 +472,7 @@ type ScaleId = 'health' | 'finance' | 'career' | 'projects';
 ## 6. Жизненные сценарии
 
 ### 6.1. Хороший день
+
 - Утро: 3 привычки Health (сон, вода, прогулка)
 - День: 2 привычки Career
 - Вечер: quest `normal` на Career
@@ -461,16 +480,19 @@ type ScaleId = 'health' | 'finance' | 'career' | 'projects';
 - XP Career × M(103) = ×1.075
 
 ### 6.2. Пропуск одного дня
+
 - Не отметил сон. S Health: 100 → 86.
 - XP следующего дня Health: × M(86) = ×0.895.
 - Никаких «-50 XP». Просто daily_score = 0 у привычки.
 
 ### 6.3. Неделя пропусков
+
 - S Health: 100 → 0. Множитель: × 0.25.
 - Выбираться — неделю.
 - Мгновенного восстановления нет.
 
 ### 6.4. Пауза (болезнь, военкомат, госпитализация)
+
 - Отмечаешь PauseDay, пишешь: «Госпитализация по военкомату».
 - daily_score = K для всех шкал.
 - XP не начисляется.
@@ -478,6 +500,7 @@ type ScaleId = 'health' | 'finance' | 'career' | 'projects';
 - В статистике месяца: «21 день паузы (68% времени)». Зеркало.
 
 ### 6.5. Достижение Trackable
+
 - Milestone «100 битов», current = 99.
 - Завершаешь quest, привязанный к milestone.
 - `current += 1 → 100`. Auto: `status = 'achieved'`.
@@ -485,17 +508,20 @@ type ScaleId = 'health' | 'finance' | 'career' | 'projects';
 - Модалка «Как это было?».
 
 ### 6.6. Достижение Declarative
+
 - Milestone «Full Planche».
 - Раз в 3 месяца nudge: «Ещё работаешь?».
 - Однажды: «Достигнуто». Создаётся Achievement.
 
 ### 6.7. Открытие приза
+
 - Reward «2 часа игр», conditions: Health ≥ 70, Career ≥ 70.
 - S Health = 75, S Career = 72 → открыт.
 - Играешь → «Использовано» → RewardLog.
 - Завтра S Health = 68 → закрыт.
 
 ### 6.8. Восстановление после падения
+
 - Две недели пропуска, S = 0.
 - День 1: S = 14. День 3: S = 42. День 7: S = 100.
 - XP: × 0.35 → × 0.5 → × 1.0.

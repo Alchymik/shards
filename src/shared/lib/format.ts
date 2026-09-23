@@ -1,1 +1,1 @@
-export const formatHabit = (): string => 'ok';
+export const formatHabit = (): string => 'ok'
