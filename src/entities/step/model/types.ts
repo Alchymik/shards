@@ -1,5 +1,5 @@
 // Step, StepId, Schedule (discriminated union)
-import type { ISODate, Weekday } from '@/shared/lib/dates'
+import type { ISODate, ISODateTime, Weekday } from '@/shared/lib/dates'
 import type { StepId, GoalId } from '@/shared/lib/ids'
 
 export type Schedule =
@@ -10,7 +10,8 @@ export type Schedule =
 
 export type Step = {
   id: StepId
-  title: string
   goalId: GoalId
+  title: string
   schedule: Schedule
+  createdAt: ISODateTime
 }

@@ -45,13 +45,15 @@ export const steps: Step[] = [
     id: asStepId('step1'),
     title: 'Писать бит 2 часа',
     goalId: asGoalId('goal1'),
-    schedule: { kind: 'daily' }
+    schedule: { kind: 'daily' },
+    createdAt: '2026-09-01T10:00:00.000Z' as ISODateTime
   },
   {
     id: asStepId('step2'),
     title: 'Сделать темплейт проекта для битов',
     goalId: asGoalId('goal1'),
-    schedule: { kind: 'once', onDate: today }
+    schedule: { kind: 'once', onDate: today },
+    createdAt: '2026-09-25T10:00:00.000Z' as ISODateTime
   },
   {
     id: asStepId('step3'),
@@ -60,7 +62,8 @@ export const steps: Step[] = [
     schedule: {
       kind: 'weekly',
       daysOfWeek: ['tuesday', 'thursday', 'saturday']
-    }
+    },
+    createdAt: '2026-09-01T10:00:00.000Z' as ISODateTime
   }
 ]
 

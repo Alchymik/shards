@@ -113,7 +113,8 @@ daily — всегда;
 
 weekly — weekdayFromDate(d) ∈ daysOfWeek;
 
-everyNDays — diffDays(d, step.createdAt) % n === 0;
+everyNDays — diffDays(d, step.createdAt) % n === 0
+(Якорь для everyNDays — Step.createdAt. Добавление шага задним числом не поддерживается);
 
 once — d === onDate.
 
